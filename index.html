@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>深航后台管理系统</title>
+	<link rel="stylesheet" type="text/css" href="css/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="css/icon.css">
+	<link rel="stylesheet" type="text/css" href="css/color.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="js/easyui-lang-zh_CN.js"></script>
+	<script type="text/javascript" src="js/main.js"></script>
+</head>
+<body class="easyui-layout" style="overflow-y:hidden"  scroll="no">
+	<!--loading-->
+	<div id='Loading' class="loading"><h1>
+		<span>加载中···</span>
+	</div> 
+	
+	<!--top-->
+    <div region="north" split="true" border="false" class="header">
+		<span class="fl h_logo">
+			<a href="index.htm"><img src="images/logo.png" width="300" align="absmiddle" /></a>
+		</span>
+		<div class="fr h_item">
+			<p>今天是 <span>2018年3月23号 星期五</span>  <span id="date_yn">农历三月初六</span></p>
+			<p class="h_out">欢迎您 <span>admin </span> | <a href="#" id="loginOut">安全退出</a></p>
+		</div>
+    </div>
+
+	<!--导航-->
+    <div region="west" hide="true" split="true" title="导航菜单" style="width:200px;" id="west">
+		<div id="nav" class="easyui-accordion" fit="true" border="false" style="background:#f2f2f2">
+			<ul id="tree"></ul>  
+		</div>
+
+    </div>
+	
+	<!--内容-->
+	<div id="mainPanle" region="center" style="background: #eee; overflow-y:hidden">
+        <div id="tabs" class="easyui-tabs"  fit="true" border="false" >
+			<!--面板-->
+			<div title="菜单管理" style="overflow:hidden;">
+				<!--条件查询-->
+				<div style="padding:8px 3px;">
+					<span class="padd_r_n">菜单名称：<input class="easyui-textbox" style="width:100px;height:28px"></span>
+					<span class="padd_r_n">是否可用：
+						<select class="easyui-combobox" name="status" data-options="editable:false" style="width:100px;">
+							<option value="0">是</option>
+							<option value="1">否</option>
+						</select>
+					</span>
+					<span class="padd_r_n">日期：<input class="easyui-datebox" data-options="editable:false" style="width:100px;height:30px"/></span>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'" style="width:80px">查询</a>
+				</div>
+				<!--菜单栏-->
+				<div class="easyui-panel" style="padding:6px;width:100%;">
+					<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-add'" onclick="add()">新增</a>
+					<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-cancel'" onclick="isDelete()">删除</a>
+					<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-reload'" onclick="refresh()">刷新</a>
+					<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-print'" onclick="print()">打印</a>
+					<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-help'" onclick="help()">帮助</a>
+					<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-save'" onclick="saveFile()">保存</a>
+					<a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-back'">回退</a>
+				</div>
+				<!--表格-->
+				<table id="dg" style="width:100%;" data-options="rownumbers:false,fit:true,singleSelect:false,autoRowHeight:false,pagination:true,pageSize:10">
+					<thead>
+						<tr>
+							<th data-options="field:'ck',checkbox:true"></th>
+							<th data-options="field:'itemid',width:150">菜单名称</th>
+							<th data-options="field:'productid',width:150">菜单级别</th>
+							<th data-options="field:'type',width:100,">菜单类型</th>
+							<th data-options="field:'url',width:150">菜单URL</th>
+							<th data-options="field:'number',width:100,align:'center'">顺序号</th>
+							<th data-options="field:'status',width:100,align:'center'">是否可用</th>
+							<th data-options="field:'date',width:150,align:'center'">日期</th>
+							<th data-options="field:'operate',width:150,align:'center'">操作</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+			
+		</div>
+    </div>
+	
+		
+	<!--bottom-->
+    <div region="south" split="true" class="a-center footer">
+		<p>版权所有 @ 深圳市深航货运有限公司&nbsp;&nbsp;&nbsp;&nbsp;版本号：V2.0.8.001&nbsp;&nbsp;&nbsp;&nbsp;推荐使用谷歌、火狐浏览器</p>
+	</div>
+	
+	<!--新增 / 编辑-->
+	<div id="add" class="easyui-dialog" data-options="iconCls:'icon-save',modal:true,closed:true" style="width:420px;height:auto;padding:5px;">
+				<div style="padding:10px 60px 20px 60px">
+					<form id="ff" method="post">
+						<table cellpadding="5">
+							<tr>
+								<td>菜单名称:</td>
+								<td><input class="easyui-textbox" type="text" name="itemid" data-options="required:true,validType:'length[1,10]'"></input><span class="must">*</span></td>
+							</tr>
+							<tr>
+								<td>菜单级别:</td>
+								<td><input class="easyui-textbox" type="text" name="productid" data-options="required:true,validType:'length[1,10]'"></input><span class="must">*</span></td>
+							</tr>
+							<tr>
+								<td>菜单类型:</td>
+								<td><input class="easyui-textbox" type="text" name="type" data-options="required:true,validType:'length[1,10]'"></input><span class="must">*</span></td>
+							</tr>
+							<tr>
+								<td>菜单URL:</td>
+								<td><input class="easyui-textbox" name="url" data-options="multiline:true,required:true,validType:'length[1,100]'" style="height:60px"></input><span class="must">*</span></td>
+							</tr>
+							<tr>
+								<td>顺序号:</td>
+								<td>
+									<input class="easyui-textbox" name="number" data-options="validType:'number'" style="height:60px"></input>
+								</td>
+							</tr>
+							<tr>
+								<td>是否可用:</td>
+								<td>
+									<select class="easyui-combobox" name="status" data-options="editable:false" style="width:173px;"><option value="0" selected="selected">是</option><option value="1">否</option></select>
+								</td>
+							</tr>
+							<tr>
+								<td>日期:</td>
+								<td>
+									<input class="easyui-datetimebox" name="date" data-options="editable:false" style="width:173px;height:30px"/>
+								</td>
+							</tr>
+						</table>
+					</form>
+				</div>
+			
+			<div data-options="region:'south',border:false" style="text-align:right;padding:5px 0 0;" id="addButton">
+				<a class="easyui-linkbutton" data-options="iconCls:'icon-ok'" href="javascript:void(0)" onclick="addError()" style="width:80px">保存</a>
+				<a class="easyui-linkbutton" data-options="iconCls:'icon-cancel'" href="javascript:void(0)" onclick="javascript:$('#add').dialog('close');" style="width:80px">取消</a>
+			</div>
+			
+			<div data-options="region:'south',border:false" style="text-align:right;padding:5px 0 0;" id="editButton">
+				<a class="easyui-linkbutton" data-options="iconCls:'icon-ok'" href="javascript:void(0)" onclick="editError()" style="width:80px">保存</a>
+				<a class="easyui-linkbutton" data-options="iconCls:'icon-cancel'" href="javascript:void(0)" onclick="javascript:$('#add').dialog('close');" style="width:80px">取消</a>
+			</div>
+	</div>
+	
+	
+</body>
+<script type="text/javascript" src="js/validatebox.js"></script>
+<script type="text/javascript">
+	//loading
+	function closes(){
+		$("#Loading").fadeOut("normal",function(){
+			$(".datagrid-pager.pagination").css("margin","-86px 0 0 0");
+			$(this).remove();
+		});
+	}
+	var pc;
+	$.parser.onComplete = function(){
+		if(pc) clearTimeout(pc);
+		pc = setTimeout(closes, 1000);
+	}
+	
+	
+	
+	//添加列表数据、分页
+	function getData(){
+		var rows = [];
+		for(var i=1; i<=800; i++){
+			var amount = Math.floor(Math.random()*1000);
+			rows.push({
+				itemid: 'Inv No '+amount,
+				productid: 'productid_'+i,
+				type: '菜单',
+				url: '/sys/menu/',
+				number: i,
+				status: '是',
+				date: $.fn.datebox.defaults.formatter(new Date()),
+				operate: '<a href="#" class="easyui-linkbutton" data-options="iconCls:"\'icon-remove"\' onclick="isDelete()">删除</a>'+' | '+'<a href="#" class="easyui-linkbutton" data-options="iconCls:"\'icon-edit"\' onclick="edit()">编辑</a>'
+			});
+		}
+		return rows;
+	}
+	
+	function pagerFilter(data){
+		if (typeof data.length == 'number' && typeof data.splice == 'function'){	// is array
+			data = {
+				total: data.length,
+				rows: data
+			}
+		}
+		var dg = $(this);
+		var opts = dg.datagrid('options');
+		var pager = dg.datagrid('getPager');
+		pager.pagination({
+			onSelectPage:function(pageNum, pageSize){
+				opts.pageNumber = pageNum;
+				opts.pageSize = pageSize;
+				pager.pagination('refresh',{
+					pageNumber:pageNum,
+					pageSize:pageSize
+				});
+				dg.datagrid('loadData',data);
+			}
+		});
+		if (!data.originalRows){
+			data.originalRows = (data.rows);
+		}
+		var start = (opts.pageNumber-1)*parseInt(opts.pageSize);
+		var end = start + parseInt(opts.pageSize);
+		data.rows = (data.originalRows.slice(start, end));
+		return data;
+	}
+	
+	$(function(){
+		$('#dg').datagrid({loadFilter:pagerFilter}).datagrid('loadData', getData());
+	});
+</script>
+</html>

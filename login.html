@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="css/default/easyui.css">
+		<link rel="stylesheet" type="text/css" href="css/icon.css">
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$('#login-window').window({
+					//可伸缩箭头
+					collapsible: false,
+					// 最小化
+					minimizable: false,
+					// 最大化
+					maximizable: false,
+					//调整窗口大小
+					resizable: false,
+					//拖拽操作
+					draggable: false,
+					//关闭按钮
+					closable: false,
+					border: false,
+					shadow: false
+				});
+			});
+			//对用户敲击键盘事件进行监听
+			document.onkeydown = function(e) {
+				var event = e || window.event;
+				var code = event.keyCode || event.which || event.charCode; //支持IE、FF 
+				if(code == 13) { //回车键事件  
+					login();
+				}
+			}
+			$(function() {
+				$("input[name='login']").focus();
+			});
+
+			function cleardata() { //清空数据
+				$('#loginForm').form('clear');
+			}
+
+			function login() {
+				if($("input[name='login']").val() == "" || $("input[name='password']").val() == "") {
+					$("#showMsg").html("用户名或密码不能为空");
+					$("input[name='login']").focus();
+				} else {
+					//ajax异步提交
+					$.ajax({
+						type: "post",
+						url: "",
+						data: $("#loginForm").serialize(), //序列化
+						error: function(request) { // 设置表单提交出错 
+							$("#showMsg").html("用户名或密码错误"); //登录错误提示信息
+						},
+						success: function(data) {
+							//alert(data);
+							//window.open('text.html', '_self');
+							document.location = "index.html";
+						}
+					});
+
+				}
+			}
+		</script>
+		<style type="text/css">
+			.panel.window.panel-htop.window-thinborder.window-noborder {
+				border: 1px solid #95B8E7;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div id="login-window" class="easyui-window" title="登录" style="width:400px;padding:20px 70px 20px 70px;">
+			<form id="loginForm" method="post" action="">
+				<div style="padding:5px 0;height: 14px;text-align: center;color: red;" id="showMsg"></div>
+				<div style="margin-bottom:10px">
+					<input class="easyui-textbox" id="logname" name="login" type="text" style="width:100%;height:30px;padding:12px" data-options="prompt:'用户名',iconCls:'icon-man',iconWidth:38">
+				</div>
+				<div style="margin-bottom:20px">
+					<input class="easyui-textbox" id="logpass" name="password" type="password" style="width:100%;height:30px;padding:12px" data-options="prompt:'密码',iconCls:'icon-lock',iconWidth:38">
+				</div>
+				<div style="margin-bottom:20px">
+					<input class="easyui-textbox" type="text" id="logyzm" style="width:50%;height:30px;padding:12px" data-options="prompt:'验证码'">
+					<a href="javascript:;" class="showcode" onclick=""><img style=" margin:0 0 0 3px ; vertical-align:middle; height:37px;" src="images/code.png"></a>
+				</div>
+				<div style="margin-bottom:20px">
+					<input type="checkbox" checked="checked" id="logrem">
+					<span>记住密码</span>
+				</div>
+				<div>
+					<a href="javascript:;" onclick="login()" class="easyui-linkbutton" data-options="iconCls:'icon-ok'" style="padding:5px 0px;width:100%;">
+						<span style="font-size:14px;">登录</span>
+					</a>
+				</div>
+			</form>
+		</div>
+	</body>
+
+</html>
